@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitTool-array" />
+   <configVersion>2</configVersion>
+   <userRemoteConfigs>
+       <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/.......</url>
+       </hudson.plugins.git.UserRemoteConfig>
+  </userRemoteConfigs>
+  <branches>
+    <hudson.plugins.git.brancheSpec>
+      <name>*/master</name>
+    </hudson.plugins.git.brancheSpec>  
+  </branches>
+</project>

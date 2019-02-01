@@ -1,0 +1,52 @@
+---
+  - name: Start Jenkins Service for Job Build 
+    hosts: 127.0.0.1
+    connection: local
+
+
+
+    tasks:
+
+          - name: install add-apt-repostory
+            become: true
+            apt: name=software-properties-common state=latest  
+
+          - name: add webupd8team repositories
+            become: true
+            apt_repository: repo="ppa:openjdk/ppa" state=present
+    
+
+          - name: install required software for Jenkins job Build
+            become: true
+            apt: name={{item}} state=latest update_cache=true cache_valid_time=3600
+            with_items:
+            - openjdk-8-jdk
+            - git
+            - git-core
+            - default-jre      
+            - default-jdk
+            - maven
+            - ant 
+
+          #- name: Loging with Admin Credential for Jenkins 
+           # sudo: yes
+            #action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ login  
+
+
+          - name: List of Jenkins jobs
+            sudo: yes
+            action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ list-jobs --username samya --password admin
+
+          
+
+          - name: Build a job 
+            sudo: yes 
+            action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ build JOB_test_for_s2s_vpn_ --username samya --password admin
+
+          - name: Get the job 
+            sudo: yes
+            action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ get-job JOB_test_for_s2s_vpn_ --username samya --password admin
+
+          - name: List changes
+            sudo: yes
+            action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ list-changes JOB_test_for_s2s_vpn_ '1-100' -format XML --username samya --password admin

@@ -1,0 +1,65 @@
+---
+  - name: Start Jenkins Service Job  
+    hosts: 127.0.0.1
+    connection: local
+
+
+    
+    tasks:
+
+          - name: install add-apt-repostory
+            become: true
+            apt: name=software-properties-common state=latest  
+
+          - name: add webupd8team repositories
+            become: true
+            apt_repository: repo="ppa:openjdk/ppa" state=present
+    
+
+          - name: install required software for Jenkins job Start
+            become: true
+            apt: name={{item}} state=latest update_cache=true cache_valid_time=3600
+            with_items:
+            - openjdk-8-jdk
+            - git
+            - git-core
+            - default-jre      
+            - default-jdk
+            - maven 
+
+          - name: Clone git repo
+            git: repo=https://github.com/ dest=/home/samya/SitetoSite_VPN
+
+
+
+          #- name: Copy job config file from other system or target system
+           # copy:
+            #  src: /{{source path of the job config file of your target system}}/job_config.xml
+             # dest: /{{path of your jankins config file}}/config.xml
+              #owner: admin
+              #group: admin
+              #mode: 0777
+
+
+
+          - name: Get jenkins client jar file
+            action: shell wget localhost:8080/jnlpJars/jenkins-cli.jar
+
+            args:
+              creates: /home/samya/Ansible-Jenkins/jenkins-cli.jar ## put the jenkins-cli.jar into your working directory
+
+          - name: create job for jenkins
+            sudo: yes
+            action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ create-job JOB_test_for_s2s_vpn_ --username samya --password admin  < /home/samya/Ansible-Jenkins/Job_for_S2S_VPN.xml
+
+          - name: Start/Restart Jenkins
+            sudo: yes
+            action: shell service jenkins restart 
+            #action: shell java -jar /home/samya/Ansible-Jenkins/jenkins-cli.jar -s http://localhost:8080/ login 
+
+          - name: Wait for Jenkins to become available
+            wait_for: port=8080  
+
+          
+
+          
